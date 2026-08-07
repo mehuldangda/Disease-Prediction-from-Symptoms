@@ -1,0 +1,35 @@
+graph TD
+    subgraph Client ["Frontend Layer (React + Vite)"]
+        UI["React SPA User Interface"]
+        SS["Symptom Selector & Autocomplete"]
+        RP["Result Visualizer & Probability Gauges"]
+    end
+
+    subgraph API ["Backend API Layer (FastAPI)"]
+        Router["APIRouter (/api)"]
+        Middleware["CORS & Request Logger"]
+        Schema["Pydantic Validation Schemas"]
+    end
+
+    subgraph Core ["Service & Engine Layer"]
+        Service["Prediction Service"]
+        Predictor["ML Inference Engine"]
+        DB["Disease Knowledge Base"]
+    end
+
+    subgraph ML ["Machine Learning Binaries"]
+        RF["Random Forest (.joblib)"]
+        GB["Gradient Boost (.joblib)"]
+        Meta["Symptom Metadata (.json)"]
+    end
+
+    UI -->|HTTP POST /api/predict| Router
+    Router --> Middleware
+    Middleware --> Schema
+    Schema --> Service
+    Service --> Predictor
+    Predictor -->|Vector [0,1]^132| RF
+    Predictor -->|Vector [0,1]^132| GB
+    Predictor --> DB
+    DB -->|Description, Precautions, Doctor| Service
+    Service -->|JSON Response| UI

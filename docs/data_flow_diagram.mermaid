@@ -1,0 +1,18 @@
+sequenceDiagram
+    autonumber
+    actor User as Patient / Clinician
+    participant UI as React Frontend
+    participant API as FastAPI Backend
+    participant ML as Scikit-Learn Model
+    participant KB as Disease DB
+
+    User->>UI: Select Symptoms (e.g. ["skin_rash", "itching"])
+    UI->>API: POST /api/predict { symptoms, model_name }
+    API->>API: Validate Pydantic Schema & Normalize Keys
+    API->>ML: Pass 132-length Binary Feature Array
+    ML-->>API: Class Probabilities Array predict_proba()
+    API->>API: Rank Top 3 Predictions & Confidence Scores
+    API->>KB: Query Disease Metadata (Description, Precautions, Doctor)
+    KB-->>API: Return Enriched Clinical Information
+    API-->>UI: 200 OK { primary_prediction, top_3, precautions, doctor }
+    UI->>User: Display Confidence Gauge, Differential Bars, & Action Steps

@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DiagnoWise - AI Health Risk Assessment & Disease Prediction Platform</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #10b981;
+      --primary-hover: #059669;
+      --accent: #06b6d4;
+      --indigo: #6366f1;
+      --bg-main: #090d16;
+      --bg-card: rgba(15, 23, 42, 0.75);
+      --bg-input: rgba(15, 23, 42, 0.6);
+      --border-color: rgba(255, 255, 255, 0.08);
+      --border-highlight: rgba(16, 185, 129, 0.35);
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --radius-md: 14px;
+      --radius-lg: 20px;
+      --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
+      --shadow-glow: 0 0 30px rgba(16, 185, 129, 0.25);
+    }
+    [data-theme="light"] {
+      --bg-main: #f8fafc;
+      --bg-card: rgba(255, 255, 255, 0.9);
+      --bg-input: #ffffff;
+      --border-color: rgba(0, 0, 0, 0.08);
+      --border-highlight: rgba(16, 185, 129, 0.5);
+      --text-main: #0f172a;
+      --text-muted: #475569;
+      --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.08);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; transition: background-color 0.25s, color 0.25s, border-color 0.25s; }
+    body {
+      background-color: var(--bg-main);
+      color: var(--text-main);
+      min-height: 100vh;
+      line-height: 1.6;
+      background-image: radial-gradient(at 10% 10%, rgba(16, 185, 129, 0.12) 0px, transparent 40%), radial-gradient(at 90% 90%, rgba(99, 102, 241, 0.1) 0px, transparent 40%);
+      background-attachment: fixed;
+    }
+    .navbar { background: var(--bg-card); backdrop-filter: blur(16px); border-bottom: 1px solid var(--border-color); position: sticky; top: 0; z-index: 100; padding: 1rem 1.5rem; display: flex; justify-content: space-between; align-items: center; }
+    .brand { display: flex; align-items: center; gap: 0.75rem; text-decoration: none; color: var(--text-main); font-weight: 800; font-size: 1.4rem; }
+    .brand-icon { background: linear-gradient(135deg, var(--primary), var(--accent)); width: 40px; height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; box-shadow: var(--shadow-glow); }
+    .nav-links { display: flex; align-items: center; gap: 1rem; list-style: none; }
+    .nav-link { color: var(--text-muted); background: none; border: none; font-weight: 600; padding: 0.5rem 1rem; border-radius: 8px; cursor: pointer; }
+    .nav-link.active, .nav-link:hover { color: var(--text-main); background: rgba(255,255,255,0.08); }
+    .container { max-width: 1240px; margin: 0 auto; padding: 2.5rem 1.5rem; }
+    .glass-panel { background: var(--bg-card); backdrop-filter: blur(16px); border: 1px solid var(--border-color); border-radius: var(--radius-lg); box-shadow: var(--shadow-lg); padding: 2rem; margin-bottom: 2rem; }
+    .hero-title { font-size: 3.5rem; font-weight: 800; text-align: center; margin-bottom: 1rem; letter-spacing: -1px; }
+    .hero-title span { background: linear-gradient(135deg, #10b981, #06b6d4, #6366f1); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; padding: 0.85rem 1.75rem; font-size: 1rem; font-weight: 700; border-radius: 8px; border: none; cursor: pointer; transition: all 0.25s; text-decoration: none; }
+    .btn-primary { background: linear-gradient(135deg, var(--primary), var(--accent)); color: white; box-shadow: 0 4px 14px rgba(16, 185, 129, 0.35); }
+    .btn-primary:hover { opacity: 0.95; transform: translateY(-2px); }
+    .btn-secondary { background: rgba(255,255,255,0.08); color: var(--text-main); border: 1px solid var(--border-color); }
+    .btn-danger { background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); color: #ef4444; padding: 0.45rem 1rem; border-radius: 8px; font-weight: 700; cursor: pointer; }
+    .btn-danger:hover { background: #ef4444; color: white; }
+    .search-box { position: relative; margin-bottom: 1.5rem; }
+    .search-input { width: 100%; padding: 1.1rem 1.25rem 1.1rem 3rem; font-size: 1.05rem; background: var(--bg-input); border: 1px solid var(--border-color); border-radius: var(--radius-md); color: var(--text-main); outline: none; }
+    .search-input:focus { border-color: var(--primary); }
+    .category-tabs { display: flex; gap: 0.6rem; overflow-x: auto; padding-bottom: 0.6rem; margin-bottom: 1.5rem; }
+    .category-tab { padding: 0.5rem 1.1rem; border-radius: 999px; background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border-color); color: var(--text-muted); font-size: 0.88rem; font-weight: 600; cursor: pointer; white-space: nowrap; }
+    .category-tab.active { background: rgba(16, 185, 129, 0.15); border-color: var(--border-highlight); color: var(--primary); }
+    .chips-container { display: flex; flex-wrap: wrap; gap: 0.65rem; max-height: 380px; overflow-y: auto; padding: 0.85rem; background: var(--bg-input); border-radius: 12px; border: 1px solid var(--border-color); }
+    .symptom-chip { padding: 0.55rem 1rem; border-radius: 8px; font-size: 0.9rem; font-weight: 600; cursor: pointer; background: rgba(255, 255, 255, 0.06); border: 1px solid var(--border-color); user-select: none; }
+    .symptom-chip.selected { background: linear-gradient(135deg, var(--primary), var(--accent)); color: white; border-color: transparent; }
+    .risk-badge { display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.35rem 0.9rem; border-radius: 999px; font-size: 0.85rem; font-weight: 800; text-transform: uppercase; }
+    .risk-Low { background: rgba(16, 185, 129, 0.2); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.5); }
+    .risk-Moderate { background: rgba(245, 158, 11, 0.2); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.5); }
+    .risk-High { background: rgba(239, 68, 68, 0.2); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.5); }
+    .confidence-gauge { width: 120px; height: 120px; border-radius: 50%; background: conic-gradient(var(--primary) calc(var(--pct) * 1%), rgba(255, 255, 255, 0.1) 0); display: flex; align-items: center; justify-content: center; margin: 1.5rem auto; box-shadow: var(--shadow-glow); }
+    .gauge-inner { width: 96px; height: 96px; border-radius: 50%; background: var(--bg-main); display: flex; flex-direction: column; align-items: center; justify-content: center; font-weight: 800; font-size: 1.5rem; color: var(--primary); }
+    .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(420px, 1fr)); gap: 2rem; }
+    .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem; }
+    .progress-bg { background: rgba(255, 255, 255, 0.1); border-radius: 999px; height: 10px; width: 100%; margin-top: 0.5rem; overflow: hidden; }
+    .progress-fill { background: linear-gradient(90deg, var(--primary), var(--accent)); height: 100%; border-radius: 999px; }
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <a href="#" class="brand" onclick="showPage('home')">
+      <div class="brand-icon">🩺</div>
+      Diagno<span style="color:var(--primary); font-weight:400; font-size:1.2rem;">Wise</span>
+    </a>
+    <ul class="nav-links">
+      <li><button class="nav-link active" id="nav-home" onclick="showPage('home')">Home</button></li>
+      <li><button class="nav-link" id="nav-predict" onclick="showPage('predict')">Symptom Checker</button></li>
+      <li><button class="nav-link" id="nav-about" onclick="showPage('about')">Architecture & Tech</button></li>
+      <li><button class="btn btn-secondary" onclick="toggleTheme()" id="theme-btn">🌙 Dark</button></li>
+      <li><button class="btn btn-primary" onclick="showPage('predict')">Start Diagnosis →</button></li>
+    </ul>
+  </nav>
+
+  <div class="container">
+    <!-- Home Page -->
+    <div id="page-home">
+      <div style="text-align: center; padding: 3.5rem 1rem 4rem;">
+        <div style="display: inline-block; background: rgba(16, 185, 129, 0.15); border: 1px solid var(--border-highlight); color: var(--primary); padding: 0.45rem 1.2rem; border-radius: 999px; font-size: 0.88rem; font-weight: 700; margin-bottom: 1.75rem;">
+          ✨ AI-Powered Health Risk Assessment Platform
+        </div>
+        <h1 class="hero-title">
+          DiagnoWise <br>
+          <span>Intelligent Disease Prediction & Clinical Guidance</span>
+        </h1>
+        <p style="color: var(--text-muted); max-width: 720px; margin: 0 auto 2.5rem; font-size: 1.25rem;">
+          Analyze symptoms using machine learning and receive intelligent disease predictions, confidence scores, specialist recommendations, and health guidance.
+        </p>
+        <button class="btn btn-primary" style="padding: 1rem 2.25rem; font-size: 1.1rem;" onclick="showPage('predict')">Start Diagnosis →</button>
+      </div>
+
+      <!-- Stats Grid -->
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.5rem; margin: 2rem 0 4rem;">
+        <div class="glass-panel" style="text-align: center; padding: 1.75rem;">
+          <div style="font-size: 2.75rem; font-weight: 800; color: var(--primary);">132</div>
+          <div style="color: var(--text-muted); font-weight: 600;">Supported Symptoms</div>
+        </div>
+        <div class="glass-panel" style="text-align: center; padding: 1.75rem;">
+          <div style="font-size: 2.75rem; font-weight: 800; color: var(--primary);">41</div>
+          <div style="color: var(--text-muted); font-weight: 600;">Target Diagnoses</div>
+        </div>
+        <div class="glass-panel" style="text-align: center; padding: 1.75rem;">
+          <div style="font-size: 2.75rem; font-weight: 800; color: var(--primary);">4</div>
+          <div style="color: var(--text-muted); font-weight: 600;">ML Ensemble Models</div>
+        </div>
+        <div class="glass-panel" style="text-align: center; padding: 1.75rem;">
+          <div style="font-size: 2.75rem; font-weight: 800; color: var(--primary);">97.6%+</div>
+          <div style="color: var(--text-muted); font-weight: 600;">Benchmark Accuracy</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Predict Page -->
+    <div id="page-predict" style="display: none;">
+      <div class="glass-panel">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+          <div>
+            <h2 style="font-size: 1.6rem; font-weight: 800;">Patient Symptom Intelligence</h2>
+            <p style="color: var(--text-muted); font-size: 0.95rem;">Select all present symptoms to run AI diagnostic inference.</p>
+          </div>
+          <div>
+            <label style="font-size: 0.85rem; color: var(--text-muted); font-weight: 700;">ML Engine:</label>
+            <select id="model-select" style="background: var(--bg-input); border: 1px solid var(--border-color); color: var(--text-main); padding: 0.5rem 0.9rem; border-radius: 8px; font-size: 0.9rem;">
+              <option value="random_forest">Random Forest Classifier</option>
+              <option value="gradient_boost">Gradient Boosting</option>
+              <option value="decision_tree">Decision Tree</option>
+              <option value="mnb">Multinomial Naive Bayes</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Dedicated Selected Symptoms Tray -->
+        <div style="margin-bottom: 1.75rem; padding: 1.5rem; background: rgba(16, 185, 129, 0.12); border: 1.5px dashed var(--border-highlight); border-radius: 12px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+            <div>
+              <h4 style="font-weight: 800; font-size: 1.05rem;">📋 Selected Symptoms (<span id="selected-count">0</span>)</h4>
+              <div id="selected-tags" style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.75rem;">
+                <span style="color: var(--text-muted); font-size: 0.9rem;">No symptoms selected yet.</span>
+              </div>
+            </div>
+            <button class="btn-danger" id="clear-all-btn" style="display: none;" onclick="clearAllSymptoms()">Clear All Symptoms</button>
+          </div>
+        </div>
+
+        <div class="search-box">
+          <span style="position: absolute; left: 1.2rem; top: 50%; transform: translateY(-50%); color: var(--text-muted);">🔍</span>
+          <input type="text" id="search-input" class="search-input" placeholder="Search symptoms by keyword (e.g. fever, skin rash, headache)..." oninput="filterSymptoms()">
+        </div>
+
+        <div class="category-tabs" id="category-tabs"></div>
+        <div class="chips-container" id="chips-container">Loading symptom catalog...</div>
+
+        <div style="margin-top: 2rem; display: flex; justify-content: flex-end;">
+          <button class="btn btn-primary" id="btn-predict" style="padding: 1rem 2.25rem; font-size: 1.05rem;" onclick="runPrediction()">Run AI Health Risk Assessment →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Result Page -->
+    <div id="page-result" style="display: none;">
+      <div id="result-content"></div>
+    </div>
+
+    <!-- About Page -->
+    <div id="page-about" style="display: none;">
+      <div class="glass-panel">
+        <h2 style="font-size: 1.8rem; font-weight: 800; margin-bottom: 1rem;">DiagnoWise Engineering Specs</h2>
+        <p style="color: var(--text-muted); margin-bottom: 1.5rem;">
+          End-to-end clinical machine learning pipeline developed with FastAPI, Scikit-learn, and React.
+        </p>
+        <div style="background: var(--bg-input); padding: 1.25rem; border-radius: 10px; border: 1px solid var(--border-color);">
+          <p><strong>Dataset Scope:</strong> 41 Unique Target Diagnoses & 132 Medical Symptom Features</p>
+          <p><strong>Accuracy Metrics:</strong> 97.62% - 100.00% across test evaluations</p>
+          <p><strong>Backend Architecture:</strong> FastAPI Asynchronous REST Architecture</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let allSymptoms = [];
+    let selectedSymptoms = new Set();
+    let currentCategory = 'All';
+    let currentTheme = 'dark';
+    let lastResult = null;
+
+    async function init() {
+      try {
+        const res = await fetch('/api/symptoms');
+        const data = await res.json();
+        allSymptoms = data.symptoms;
+        renderCategories(data.categories);
+        renderSymptoms();
+      } catch (err) {
+        console.error('Failed to load symptoms:', err);
+      }
+    }
+
+    function toggleTheme() {
+      currentTheme = currentTheme === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', currentTheme);
+      document.getElementById('theme-btn').innerText = currentTheme === 'dark' ? '🌙 Dark' : '☀️ Light';
+    }
+
+    function showPage(pageId) {
+      ['home', 'predict', 'result', 'about'].forEach(p => {
+        document.getElementById(`page-${p}`).style.display = p === pageId ? 'block' : 'none';
+        const nav = document.getElementById(`nav-${p}`);
+        if (nav) nav.classList.toggle('active', p === pageId);
+      });
+    }
+
+    function renderCategories(cats) {
+      const tabs = document.getElementById('category-tabs');
+      tabs.innerHTML = `<button class="category-tab active" onclick="setCategory('All', this)">All Symptoms (${allSymptoms.length})</button>` +
+        cats.map(c => `<button class="category-tab" onclick="setCategory('${c}', this)">${c}</button>`).join('');
+    }
+
+    function setCategory(cat, btn) {
+      currentCategory = cat;
+      document.querySelectorAll('.category-tab').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      filterSymptoms();
+    }
+
+    function filterSymptoms() {
+      const q = document.getElementById('search-input').value.toLowerCase();
+      renderSymptoms(q);
+    }
+
+    function renderSymptoms(query = '') {
+      const container = document.getElementById('chips-container');
+      const filtered = allSymptoms.filter(s => {
+        const matchQ = s.label.toLowerCase().includes(query) || s.key.toLowerCase().includes(query);
+        const matchC = currentCategory === 'All' || s.category === currentCategory;
+        return matchQ && matchC;
+      });
+
+      container.innerHTML = filtered.map(s => {
+        const sel = selectedSymptoms.has(s.key);
+        return `<div class="symptom-chip ${sel ? 'selected' : ''}" onclick="toggleSymptom('${s.key}')">
+          ${sel ? '✓' : '+'} ${s.label}
+        </div>`;
+      }).join('');
+    }
+
+    function toggleSymptom(key) {
+      if (selectedSymptoms.has(key)) selectedSymptoms.delete(key);
+      else selectedSymptoms.add(key);
+      renderSymptoms(document.getElementById('search-input').value.toLowerCase());
+      updateSelectedUI();
+    }
+
+    function clearAllSymptoms() {
+      selectedSymptoms.clear();
+      renderSymptoms(document.getElementById('search-input').value.toLowerCase());
+      updateSelectedUI();
+    }
+
+    function updateSelectedUI() {
+      document.getElementById('selected-count').innerText = selectedSymptoms.size;
+      const tags = document.getElementById('selected-tags');
+      const clearBtn = document.getElementById('clear-all-btn');
+
+      if (selectedSymptoms.size === 0) {
+        tags.innerHTML = '<span style="color: var(--text-muted); font-size: 0.9rem;">No symptoms selected yet.</span>';
+        clearBtn.style.display = 'none';
+      } else {
+        clearBtn.style.display = 'inline-block';
+        tags.innerHTML = Array.from(selectedSymptoms).map(k => {
+          const item = allSymptoms.find(s => s.key === k);
+          return `<span style="background: rgba(16, 185, 129, 0.2); border: 1px solid var(--border-highlight); padding: 0.3rem 0.75rem; border-radius: 8px; font-size: 0.85rem; font-weight: 600; display: inline-flex; align-items: center; gap: 0.5rem;">
+            ✓ ${item ? item.label : k} <span style="cursor:pointer" onclick="toggleSymptom('${k}')">✕</span>
+          </span>`;
+        }).join('');
+      }
+    }
+
+    async function runPrediction() {
+      if (selectedSymptoms.size === 0) return alert('Please select at least one symptom.');
+      const model = document.getElementById('model-select').value;
+      const btn = document.getElementById('btn-predict');
+      btn.innerText = 'Analyzing Symptoms...';
+      btn.disabled = true;
+
+      try {
+        const res = await fetch('/api/predict', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ symptoms: Array.from(selectedSymptoms), model_name: model })
+        });
+        const data = await res.json();
+        lastResult = data;
+        renderResult(data);
+        showPage('result');
+      } catch (err) {
+        alert('Prediction error: ' + err.message);
+      } finally {
+        btn.innerText = 'Run AI Health Risk Assessment →';
+        btn.disabled = false;
+      }
+    }
+
+    function printReport() {
+      window.print();
+    }
+
+    function renderResult(data) {
+      const container = document.getElementById('result-content');
+      const sev = (data.severity || 'Moderate').toLowerCase();
+      let riskTag = 'risk-Moderate';
+      let riskLabel = 'Moderate Risk';
+
+      if (sev.includes('high') || sev.includes('critical')) {
+        riskTag = 'risk-High'; riskLabel = 'High Risk';
+      } else if (sev.includes('low')) {
+        riskTag = 'risk-Low'; riskLabel = 'Low Risk';
+      }
+
+      container.innerHTML = `
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+          <button class="btn btn-secondary" onclick="showPage('predict')">← Test Different Symptoms</button>
+          <button class="btn btn-primary" onclick="printReport()">📄 Download Clinical PDF Health Report</button>
+        </div>
+
+        <div class="glass-panel" style="text-align: center;">
+          <div style="display: flex; justify-content: center; gap: 0.75rem; margin-bottom: 1rem;">
+            <span class="risk-badge ${riskTag}">● ${riskLabel}</span>
+          </div>
+          <h1 style="font-size: 2.8rem; font-weight: 800; margin: 0.4rem 0;">${data.primary_prediction}</h1>
+          <div class="confidence-gauge" style="--pct: ${data.confidence_percentage}">
+            <div class="gauge-inner">${data.confidence_percentage}%</div>
+          </div>
+          <p style="color: var(--text-muted); max-width: 720px; margin: 0 auto 1.5rem;">${data.description}</p>
+        </div>
+
+        <div class="grid-2">
+          <div class="glass-panel">
+            <h3 style="font-size: 1.3rem; font-weight: 800; margin-bottom: 1.25rem;">📊 Top 3 Differential Diagnoses</h3>
+            ${data.top_3_predictions.map((item, idx) => `
+              <div style="background: var(--bg-input); padding: 1.1rem; border-radius: 8px; margin-bottom: 1rem; border: 1px solid var(--border-color);">
+                <div style="display: flex; justify-content: space-between; font-weight: 700;">
+                  <span>#${idx + 1} ${item.disease}</span>
+                  <span style="color: var(--primary);">${item.probability}%</span>
+                </div>
+                <div class="progress-bg"><div class="progress-fill" style="width: ${item.probability}%;"></div></div>
+                <p style="font-size: 0.82rem; color: var(--text-muted); margin-top: 0.4rem;">Specialist: ${item.doctor}</p>
+              </div>
+            `).join('')}
+          </div>
+
+          <div class="glass-panel">
+            <h3 style="font-size: 1.3rem; font-weight: 800; margin-bottom: 1.25rem;">🛡️ Actionable Health Precautions</h3>
+            ${data.precautions.map((step, idx) => `
+              <div style="background: var(--bg-input); border-left: 4px solid var(--primary); padding: 0.9rem; border-radius: 0 8px 8px 0; margin-bottom: 0.75rem;">
+                <strong style="color: var(--primary);">Step ${idx + 1}:</strong> ${step}
+              </div>
+            `).join('')}
+
+            <div style="background: rgba(16, 185, 129, 0.12); border: 1px solid var(--border-highlight); padding: 1.25rem; border-radius: 12px; margin-top: 1.5rem; display: flex; gap: 1rem; align-items: center;">
+              <div style="font-size: 2.5rem;">👨‍⚕️</div>
+              <div>
+                <span style="font-size: 0.75rem; text-transform: uppercase; color: var(--primary); font-weight: 800;">Recommended Specialist</span>
+                <h4 style="font-size: 1.2rem; font-weight: 800;">${data.recommended_doctor}</h4>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    init();
+  </script>
+</body>
+</html>
