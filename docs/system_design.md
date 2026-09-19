@@ -1,59 +1,43 @@
-# System Design Document - Disease Prediction System
+# System Design Document - DiagnoWise AI Disease Prediction System
 
 ## 1. Requirements
 
 ### Functional Requirements
-- **FR1 (Symptom Lookup):** Retrieve a structured catalog of 130+ medical symptoms categorized by domain with search support.
-- **FR2 (Multi-Symptom Selection):** Allow selection of multiple binary symptoms.
-- **FR3 (ML Inference):** Infer disease prognosis using trained scikit-learn models.
-- **FR4 (Differential Diagnosis):** Return top-3 ranked disease predictions with confidence percentages.
-- **FR5 (Clinical Guidance):** Provide descriptions, 4-step precautionary steps, and specialist medical doctor recommendations.
+- **FR1 (Symptom Lookup):** Retrieve a structured catalog of 132 medical symptoms categorized by domain with instant search and autocomplete support.
+- **FR2 (Multi-Symptom Selection):** Allow interactive selection of multiple binary symptoms with visual state management.
+- **FR3 (ML Inference):** Infer disease prognosis directly using trained scikit-learn ensemble and probabilistic models.
+- **FR4 (Differential Diagnosis):** Return top-3 ranked disease predictions with calibrated probability distributions and confidence percentages.
+- **FR5 (Clinical Guidance):** Provide disease descriptions, 4-step precautionary measures, and specialist medical doctor recommendations.
+- **FR6 (Report Generation):** Generate and download customized clinical PDF health reports using FPDF2.
 
 ### Non-Functional Requirements
-- **NFR1 (Performance):** Latency under 100ms for prediction requests.
-- **NFR2 (Reliability):** 99.9% uptime with graceful exception handling and fallback models.
-- **NFR3 (Maintainability):** Modular code structure separating API routes, ML pipeline, and React components.
-- **NFR4 (Usability):** Responsive glassmorphism interface supporting mobile and desktop viewports.
+- **NFR1 (Performance):** Zero-HTTP latency; sub-50ms in-memory ML inference utilizing `@st.cache_resource`.
+- **NFR2 (Reliability):** Graceful exception handling, input validation, and automatic model loader fallback.
+- **NFR3 (Maintainability):** Clean modular Python architecture separating ML logic (`ml/`), utilities (`utils/`), and UI presentation (`app.py`).
+- **NFR4 (Usability):** Modern glassmorphism UI with Dark/Light theme toggle, responsive grid layouts, and mobile/desktop support.
 
 ---
 
-## 2. API Endpoints Specification
+## 2. Component Architecture
 
-### `GET /api/health`
-- **Description:** Health check status.
-- **Response:** `{ "status": "healthy", "app_name": "Disease Prediction System", "version": "2.0.0", "model_loaded": true }`
+### Streamlit Application (`app.py`)
+- Single-command reactive web application.
+- Direct invocation of Python ML pipeline (`DiseasePredictor`).
+- Session state management for selected symptoms, active category filters, model selection, prediction history, and active views.
 
-### `GET /api/symptoms`
-- **Description:** Returns list of 132 symptoms grouped by domain.
-- **Response:** `{ "total_symptoms": 132, "categories": [...], "symptoms": [...] }`
+### ML Pipeline (`ml/`)
+- `DataLoader`: Loads dataset CSVs, extracts 132 symptom features, formats labels, and assigns clinical domain tags.
+- `DiseasePredictor`: Constructs 132-dimensional binary feature vector, runs classifier `predict_proba()`, sorts top 3 predictions, and maps clinical metadata.
+- `disease_db.py`: Clinical knowledge base containing descriptions, severity ratings, 4-step precautions, and specialist doctor recommendations for all 41 target diseases.
+- `train.py`: Model training suite for Random Forest, Decision Tree, Multinomial Naive Bayes, and Gradient Boosting.
 
-### `POST /api/predict`
-- **Request Body:** `{ "symptoms": ["itching", "skin_rash"], "model_name": "random_forest" }`
-- **Response Body:**
-```json
-{
-  "primary_prediction": "Fungal infection",
-  "confidence_percentage": 60.0,
-  "confidence_score": 0.6,
-  "severity": "Low to Moderate",
-  "recommended_doctor": "Dermatologist",
-  "description": "A skin disease caused by a fungus...",
-  "precautions": [
-    "Keep the affected area clean and dry",
-    "Use antifungal creams as prescribed",
-    "Avoid sharing personal items like towels and clothing",
-    "Wear breathable cotton clothing"
-  ],
-  "top_3_predictions": [ ... ],
-  "matched_symptoms_count": 2,
-  "model_used": "random_forest"
-}
-```
+### Utility Services (`utils/`)
+- `streamlit_pdf.py`: Formatted clinical PDF generator using FPDF2 for exporting printable diagnostic summaries.
 
 ---
 
 ## 3. Data Directory & Model Storage
 - `dataset/training_data.csv`: 4,920 records x 133 columns
 - `dataset/test_data.csv`: 42 records x 133 columns
-- `saved_model/random_forest.joblib`: Serialized Random Forest classifier binary
+- `saved_model/*.joblib`: Serialized classifier binaries (Random Forest, Gradient Boosting, Decision Tree, Multinomial Naive Bayes)
 - `saved_model/model_metadata.json`: Feature column names & target classes

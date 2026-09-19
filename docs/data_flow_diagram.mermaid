@@ -1,18 +1,25 @@
 sequenceDiagram
     autonumber
     actor User as Patient / Clinician
-    participant UI as React Frontend
-    participant API as FastAPI Backend
-    participant ML as Scikit-Learn Model
-    participant KB as Disease DB
+    participant UI as Streamlit UI (app.py)
+    participant Engine as Inference Engine (ml/predictor.py)
+    participant ML as Scikit-Learn Model (.joblib)
+    participant KB as Disease Knowledge Base (ml/disease_db.py)
+    participant PDF as PDF Generator (utils/streamlit_pdf.py)
 
     User->>UI: Select Symptoms (e.g. ["skin_rash", "itching"])
-    UI->>API: POST /api/predict { symptoms, model_name }
-    API->>API: Validate Pydantic Schema & Normalize Keys
-    API->>ML: Pass 132-length Binary Feature Array
-    ML-->>API: Class Probabilities Array predict_proba()
-    API->>API: Rank Top 3 Predictions & Confidence Scores
-    API->>KB: Query Disease Metadata (Description, Precautions, Doctor)
-    KB-->>API: Return Enriched Clinical Information
-    API-->>UI: 200 OK { primary_prediction, top_3, precautions, doctor }
-    UI->>User: Display Confidence Gauge, Differential Bars, & Action Steps
+    UI->>Engine: predict(input_symptoms, model_name)
+    Engine->>Engine: Construct 132-dim Binary Feature Vector
+    Engine->>ML: model.predict_proba(vector)
+    ML-->>Engine: Class Probabilities Distribution Array
+    Engine->>Engine: Sort & Rank Top 3 Probable Prognoses
+    Engine->>KB: Query Disease Info (Description, Precautions, Doctor)
+    KB-->>Engine: Return Enriched Clinical Information
+    Engine-->>UI: Return Structured Diagnostic Dictionary
+    UI->>User: Render Risk Badge, Confidence Gauge, Differentials & Precautions
+    opt PDF Report Download
+        User->>UI: Click "Download Clinical PDF Health Report"
+        UI->>PDF: generate_health_report_pdf(result)
+        PDF-->>UI: Return Formatted PDF Bytes
+        UI-->>User: Trigger Browser File Download
+    end

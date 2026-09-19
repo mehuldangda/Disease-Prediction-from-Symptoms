@@ -86,6 +86,15 @@ class DataLoader:
             })
         return metadata
 
+    def get_symptoms_list(self):
+        metadata = self.get_symptom_metadata()
+        categories = sorted(list(set(item["category"] for item in metadata)))
+        return {
+            "total_symptoms": len(metadata),
+            "categories": categories,
+            "symptoms": metadata
+        }
+
     def _categorize_symptom(self, symptom: str) -> str:
         s = symptom.lower()
         if any(w in s for w in ['rash', 'skin', 'pimple', 'itching', 'blister', 'dusting', 'blackhead', 'peeling', 'nails']):

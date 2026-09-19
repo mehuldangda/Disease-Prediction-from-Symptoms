@@ -1,11 +1,9 @@
 services:
   - type: web
-    name: disease-prediction-backend
+    name: diagnowise-streamlit
     env: python
-    buildCommand: pip install -r requirements.txt && python -m ml.train
-    startCommand: uvicorn backend.app.main:app --host 0.0.0.0 --port $PORT
+    buildCommand: pip install -r requirements.txt && python -c "import os; os.path.exists('saved_model/random_forest.joblib') or __import__('ml.train').train.ModelTrainer().train_all()"
+    startCommand: streamlit run app.py --server.port $PORT --server.address 0.0.0.0 --server.headless true
     envVars:
       - key: PYTHON_VERSION
         value: 3.10.12
-      - key: DEFAULT_MODEL
-        value: random_forest

@@ -23,13 +23,12 @@ if %ERRORLEVEL% NEQ 0 (
 )
 
 echo.
-echo [3/3] Launching FastAPI Backend & Interactive Web Application...
+echo [3/3] Launching DiagnoWise Streamlit Application...
 echo.
 echo ===================================================================
-echo  Server running at:  http://localhost:8000
-echo  Swagger API Docs:  http://localhost:8000/docs
+echo  App running at:  http://localhost:8501
 echo ===================================================================
 echo.
-python main.py
+streamlit run app.py
 
 pause

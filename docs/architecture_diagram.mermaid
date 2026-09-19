@@ -1,35 +1,43 @@
 graph TD
-    subgraph Client ["Frontend Layer (React + Vite)"]
-        UI["React SPA User Interface"]
-        SS["Symptom Selector & Autocomplete"]
-        RP["Result Visualizer & Probability Gauges"]
+    subgraph Client ["Interactive UI Layer (Streamlit)"]
+        UI["DiagnoWise Streamlit App (app.py)"]
+        Nav["Navigation & Theme Engine"]
+        SS["Symptom Selector, Search & Categorized Chips"]
+        RP["Diagnostic Report & Probability Gauges"]
+        PDF["PDF Health Report Generator (FPDF2)"]
     end
 
-    subgraph API ["Backend API Layer (FastAPI)"]
-        Router["APIRouter (/api)"]
-        Middleware["CORS & Request Logger"]
-        Schema["Pydantic Validation Schemas"]
+    subgraph Cache ["Streamlit Resource & Data Cache"]
+        CacheRes["@st.cache_resource (Model Engines)"]
+        CacheData["@st.cache_data (Symptom Catalog)"]
     end
 
-    subgraph Core ["Service & Engine Layer"]
-        Service["Prediction Service"]
-        Predictor["ML Inference Engine"]
-        DB["Disease Knowledge Base"]
+    subgraph Core ["ML Inference Engine Layer"]
+        DataLoader["Data Loader (data_loader.py)"]
+        Predictor["Disease Predictor (predictor.py)"]
+        DB["Disease Knowledge Base (disease_db.py)"]
     end
 
-    subgraph ML ["Machine Learning Binaries"]
+    subgraph ML ["Machine Learning Models & Data"]
         RF["Random Forest (.joblib)"]
         GB["Gradient Boost (.joblib)"]
+        DT["Decision Tree (.joblib)"]
+        MNB["Multinomial Naive Bayes (.joblib)"]
         Meta["Symptom Metadata (.json)"]
+        CSV["Dataset CSVs (4,920 records x 132 features)"]
     end
 
-    UI -->|HTTP POST /api/predict| Router
-    Router --> Middleware
-    Middleware --> Schema
-    Schema --> Service
-    Service --> Predictor
-    Predictor -->|Vector [0,1]^132| RF
-    Predictor -->|Vector [0,1]^132| GB
+    UI --> Nav
+    UI --> SS
+    SS --> Predictor
+    Predictor --> CacheRes
+    DataLoader --> CacheData
+    DataLoader --> CSV
+    Predictor -->|Binary Vector [0,1]^132| RF
+    Predictor -->|Binary Vector [0,1]^132| GB
+    Predictor -->|Binary Vector [0,1]^132| DT
+    Predictor -->|Binary Vector [0,1]^132| MNB
     Predictor --> DB
-    DB -->|Description, Precautions, Doctor| Service
-    Service -->|JSON Response| UI
+    DB -->|Description, 4-Step Precautions, Doctor| RP
+    RP --> PDF
+    RP --> UI
